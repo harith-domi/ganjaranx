@@ -20,7 +20,8 @@ export async function POST(req: NextRequest) {
     const pkg = packages[packageId];
     if (!pkg) return NextResponse.json({ error: "Invalid package" }, { status: 404 });
 
-    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL ?? "http://localhost:3000";
+    const baseUrl = (process.env.NEXT_PUBLIC_BASE_URL ?? "http://localhost:3000")
+      .split("").filter(c => c.charCodeAt(0) !== 0xFEFF).join("").trim();
     const totalPts = pkg.pts + pkg.bonus;
 
     const session = await createCheckoutSession({
