@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import AnimatedSection, { StaggerGrid } from "@/components/AnimatedSection";
+import { usePoints } from "@/hooks/usePoints";
 
 type PaymentMethod = "billplz" | "stripe";
 
@@ -16,6 +17,7 @@ const packages = [
 ];
 
 export default function TopUpPage() {
+  const { balance } = usePoints();
   const [selected, setSelected] = useState(packages[2].id); // default: Popular
   const [method, setMethod] = useState<PaymentMethod>("billplz");
   const [name, setName] = useState("");
@@ -74,6 +76,13 @@ export default function TopUpPage() {
         <p className="text-slate-600 dark:text-slate-400 text-lg max-w-lg mx-auto">
           Buy Ganjaran Points instantly. <span className="font-semibold text-[#1b2660] dark:text-[#f5a623]">100 pts = RM 1</span> — no expiry, no hidden fees.
         </p>
+        {/* Current balance */}
+        {balance !== null && (
+          <div className="mt-5 inline-flex items-center gap-2 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl px-6 py-3 shadow-sm">
+            <span className="text-slate-500 dark:text-slate-400 text-sm">Your balance</span>
+            <span className="text-xl font-extrabold text-[#f5a623]">⚡ {balance.toLocaleString()} pts</span>
+          </div>
+        )}
       </AnimatedSection>
 
       <div className="grid grid-cols-1 lg:grid-cols-5 gap-8">

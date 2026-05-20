@@ -3,6 +3,7 @@
 import { useEffect, useState, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
+import { usePoints } from "@/hooks/usePoints";
 
 const packages: Record<string, { pts: number; bonus: number; priceMYR: number }> = {
   "100":   { pts: 100,   bonus: 0,    priceMYR: 1   },
@@ -16,22 +17,29 @@ const packages: Record<string, { pts: number; bonus: number; priceMYR: number }>
 
 function ResultContent() {
   const searchParams = useSearchParams();
+  const { balance, creditPoints } = usePoints();
 
-  const billplzPaid = searchParams.get("billplz[paid]") === "true";
-  const billId      = searchParams.get("billplz[id]") ?? "";
-  const pkgId       = searchParams.get("pkg") ?? "";
-
-  const isStripe      = searchParams.get("payment") === "stripe";
+  const billplzPaid     = searchParams.get("billplz[paid]") === "true";
+  const billId          = searchParams.get("billplz[id]") ?? "";
+  const pkgId           = searchParams.get("pkg") ?? "";
+  const isStripe        = searchParams.get("payment") === "stripe";
   const stripeCancelled = searchParams.get("cancelled") === "true";
-  const stripeSession = searchParams.get("session_id") ?? "";
+  const stripeSession   = searchParams.get("session_id") ?? "";
 
-  const paid = isStripe ? (!stripeCancelled && !!stripeSession) : billplzPaid;
-  const refId = isStripe ? stripeSession : billId;
-  const pkg = packages[pkgId];
+  const paid     = isStripe ? (!stripeCancelled && !!stripeSession) : billplzPaid;
+  const refId    = isStripe ? stripeSession : billId;
+  const pkg      = packages[pkgId];
   const totalPts = pkg ? pkg.pts + pkg.bonus : 0;
 
   const [visible, setVisible] = useState(false);
   useEffect(() => { setTimeout(() => setVisible(true), 80); }, []);
+
+  // Credit points exactly once — refId acts as idempotency key
+  useEffect(() => {
+    if (paid && totalPts > 0 && refId) {
+      creditPoints(totalPts, refId);
+    }
+  }, [paid, totalPts, refId, creditPoints]);
 
   return (
     <div className={`min-h-[calc(100vh-5rem)] flex items-center justify-center px-4 py-12 transition-all duration-700 ${visible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-6"}`}>
@@ -46,7 +54,15 @@ function ResultContent() {
               <p className="text-4xl font-extrabold text-[#f5a623] my-4">+{totalPts.toLocaleString()} pts</p>
             )}
             <p className="text-slate-500 dark:text-slate-400 mb-2">Your Ganjaran Points have been credited.</p>
-            {refId && <p className="text-xs text-slate-400 mb-8">Ref: {refId.slice(0, 24)}{refId.length > 24 ? "…" : ""}</p>}
+            {refId && <p className="text-xs text-slate-400 mb-4">Ref: {refId.slice(0, 24)}{refId.length > 24 ? "…" : ""}</p>}
+
+            {/* Live balance */}
+            {balance !== null && (
+              <div className="inline-flex items-center gap-2 bg-[#f5a623]/10 border border-[#f5a623]/30 text-[#f5a623] font-bold px-5 py-2.5 rounded-full mb-6 text-sm">
+                ⚡ Balance: {balance.toLocaleString()} pts
+              </div>
+            )}
+
             <div className="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl p-6 mb-8 text-left">
               <p className="text-sm font-semibold text-slate-900 dark:text-white mb-3">What&apos;s next?</p>
               <ul className="flex flex-col gap-2 text-sm text-slate-600 dark:text-slate-400">
