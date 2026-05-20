@@ -6,6 +6,7 @@ import Link from "next/link";
 
 const packages: Record<string, { pts: number; bonus: number; priceMYR: number }> = {
   "100":   { pts: 100,   bonus: 0,    priceMYR: 1   },
+  "200":   { pts: 200,   bonus: 0,    priceMYR: 2   },
   "500":   { pts: 500,   bonus: 0,    priceMYR: 5   },
   "1000":  { pts: 1000,  bonus: 50,   priceMYR: 10  },
   "2500":  { pts: 2500,  bonus: 150,  priceMYR: 25  },
