@@ -1,10 +1,9 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, Suspense } from "react";
 import { useSearchParams, useParams } from "next/navigation";
 import Link from "next/link";
 import { rewards } from "@/lib/data";
-import { Suspense } from "react";
 
 function ResultContent() {
   const params = useParams();
@@ -12,8 +11,20 @@ function ResultContent() {
   const rewardId = params.rewardId as string;
   const reward = rewards.find((r) => r.id === rewardId);
 
-  const paid = searchParams.get("billplz[paid]") === "true";
+  // Billplz params
+  const billplzPaid = searchParams.get("billplz[paid]") === "true";
   const billId = searchParams.get("billplz[id]") ?? "";
+
+  // Stripe params
+  const paymentProvider = searchParams.get("payment");
+  const stripeCancelled = searchParams.get("cancelled") === "true";
+  const stripeSessionId = searchParams.get("session_id") ?? "";
+
+  // Determine overall paid state
+  const isStripe = paymentProvider === "stripe";
+  const paid = isStripe ? (!stripeCancelled && !!stripeSessionId) : billplzPaid;
+  const refId = isStripe ? stripeSessionId : billId;
+  const providerLabel = isStripe ? "Stripe" : "Billplz";
 
   const [visible, setVisible] = useState(false);
   useEffect(() => {
@@ -31,10 +42,12 @@ function ResultContent() {
             </div>
             <h1 className="text-2xl font-extrabold text-slate-900 dark:text-white mb-2">Payment Successful!</h1>
             <p className="text-slate-500 dark:text-slate-400 mb-2">
-              Your redemption of <span className="font-semibold text-slate-700 dark:text-slate-200">{reward?.title ?? "your reward"}</span> is confirmed.
+              Your redemption of{" "}
+              <span className="font-semibold text-slate-700 dark:text-slate-200">{reward?.title ?? "your reward"}</span>{" "}
+              is confirmed.
             </p>
-            {billId && (
-              <p className="text-xs text-slate-400 mb-8">Bill ID: {billId}</p>
+            {refId && (
+              <p className="text-xs text-slate-400 mb-8">{providerLabel} ref: {refId.slice(0, 24)}{refId.length > 24 ? "…" : ""}</p>
             )}
             <div className="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl p-6 mb-8 text-left">
               <p className="text-sm font-semibold text-slate-900 dark:text-white mb-3">What&apos;s next?</p>
