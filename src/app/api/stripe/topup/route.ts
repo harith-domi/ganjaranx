@@ -34,7 +34,8 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json({ sessionUrl: session.url, sessionId: session.id });
   } catch (err) {
-    console.error("Stripe topup error:", err);
-    return NextResponse.json({ error: "Payment creation failed" }, { status: 500 });
+    console.error("Stripe topup error:", err instanceof Error ? err.message : String(err));
+    console.error("Stripe topup stack:", err instanceof Error ? err.stack : "no stack");
+    return NextResponse.json({ error: "Payment creation failed", detail: err instanceof Error ? err.message : String(err) }, { status: 500 });
   }
 }
