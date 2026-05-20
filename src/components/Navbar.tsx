@@ -18,6 +18,7 @@ export default function Navbar() {
 
         <div className="hidden md:flex items-center gap-6 text-sm font-medium text-slate-600 dark:text-slate-300">
           <Link href="/marketplace" className="hover:text-[#f5a623] transition-colors">{t("nav_marketplace")}</Link>
+          <Link href="/topup" className="hover:text-[#f5a623] transition-colors font-semibold text-[#f5a623]">⚡ GX Top-Up</Link>
           <Link href="/about" className="hover:text-[#f5a623] transition-colors">{t("nav_about")}</Link>
           <Link href="/contact" className="hover:text-[#f5a623] transition-colors">{t("nav_contact")}</Link>
         </div>
@@ -44,6 +45,7 @@ export default function Navbar() {
       {open && (
         <div className="md:hidden bg-white dark:bg-[#0b1020] border-t border-slate-100 dark:border-slate-800 px-4 py-4 flex flex-col gap-4 text-sm font-medium">
           <Link href="/marketplace" onClick={() => setOpen(false)} className="text-slate-700 dark:text-slate-300">{t("nav_marketplace")}</Link>
+          <Link href="/topup" onClick={() => setOpen(false)} className="font-semibold text-[#f5a623]">⚡ GX Top-Up</Link>
           <Link href="/about" onClick={() => setOpen(false)} className="text-slate-700 dark:text-slate-300">{t("nav_about")}</Link>
           <Link href="/contact" onClick={() => setOpen(false)} className="text-slate-700 dark:text-slate-300">{t("nav_contact")}</Link>
           <div className="border-t border-slate-100 dark:border-slate-800 pt-4 flex flex-col gap-3">
