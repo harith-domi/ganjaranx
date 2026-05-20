@@ -24,6 +24,10 @@ export default function TopUpPage() {
 
   const pkg = packages.find((p) => p.id === selected)!;
   const totalPts = pkg.pts + pkg.bonus;
+  const stripeAvailable = pkg.priceMYR >= 2; // Stripe minimum is RM 2
+
+  // Auto-switch to Billplz if Stripe not available for this package
+  const effectiveMethod = stripeAvailable ? method : "billplz";
 
   const handlePay = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -32,7 +36,7 @@ export default function TopUpPage() {
 
     try {
       const endpoint =
-        method === "billplz" ? "/api/billplz/topup" : "/api/stripe/topup";
+        effectiveMethod === "billplz" ? "/api/billplz/topup" : "/api/stripe/topup";
 
       const res = await fetch(endpoint, {
         method: "POST",
@@ -147,17 +151,21 @@ export default function TopUpPage() {
                 <span className={`text-xs font-bold ${method === "billplz" ? "text-[#1b2660] dark:text-[#f5a623]" : "text-slate-600 dark:text-slate-400"}`}>Billplz</span>
                 <span className="text-[10px] text-slate-400">FPX</span>
               </button>
-              <button type="button" onClick={() => setMethod("stripe")}
+              <button type="button"
+                onClick={() => stripeAvailable && setMethod("stripe")}
+                disabled={!stripeAvailable}
                 className={`flex flex-col items-center gap-1.5 p-3 rounded-xl border-2 transition-all ${
-                  method === "stripe"
+                  !stripeAvailable
+                    ? "border-slate-100 dark:border-slate-800 opacity-40 cursor-not-allowed"
+                    : method === "stripe"
                     ? "border-[#635bff] bg-[#635bff]/5"
                     : "border-slate-200 dark:border-slate-700"
                 }`}>
                 <div className="w-8 h-8 rounded-lg bg-[#635bff] flex items-center justify-center">
                   <span className="text-white font-extrabold text-xs">S</span>
                 </div>
-                <span className={`text-xs font-bold ${method === "stripe" ? "text-[#635bff]" : "text-slate-600 dark:text-slate-400"}`}>Stripe</span>
-                <span className="text-[10px] text-slate-400">Cards</span>
+                <span className={`text-xs font-bold ${method === "stripe" && stripeAvailable ? "text-[#635bff]" : "text-slate-600 dark:text-slate-400"}`}>Stripe</span>
+                <span className="text-[10px] text-slate-400">{stripeAvailable ? "Cards" : "Min RM 2"}</span>
               </button>
             </div>
 
@@ -185,7 +193,7 @@ export default function TopUpPage() {
 
               <button type="submit" disabled={loading}
                 className={`w-full text-white font-bold py-3.5 rounded-xl transition-all hover:scale-[1.02] active:scale-[0.98] disabled:opacity-60 disabled:cursor-not-allowed flex items-center justify-center gap-2 ${
-                  method === "billplz" ? "bg-[#002060] hover:bg-[#001540]" : "bg-[#635bff] hover:bg-[#4f46e5]"
+                  effectiveMethod === "billplz" ? "bg-[#002060] hover:bg-[#001540]" : "bg-[#635bff] hover:bg-[#4f46e5]"
                 }`}
               >
                 {loading ? (
@@ -194,8 +202,8 @@ export default function TopUpPage() {
                     Redirecting…
                   </>
                 ) : (
-                  <>Pay RM {pkg.priceMYR}.00 · Get {totalPts.toLocaleString()} pts</>
-                )}
+                  <>Pay RM {pkg.priceMYR}.00 · Get {totalPts.toLocaleString()} pts via {effectiveMethod === "billplz" ? "Billplz" : "Stripe"}</>
+)}
               </button>
             </form>
 
