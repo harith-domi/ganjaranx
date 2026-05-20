@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 72">
+  <defs>
+    <linearGradient id="xg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FFC247"/>
+      <stop offset="100%" stop-color="#E07000"/>
+    </linearGradient>
+  </defs>
+
+  <!-- G lettermark -->
+  <text x="2" y="64" font-family="Arial Black, Impact, sans-serif" font-size="66" font-weight="900" fill="#1B2660">G</text>
+  <!-- X lettermark in gold -->
+  <text x="40" y="64" font-family="Arial Black, Impact, sans-serif" font-size="58" font-weight="900" fill="url(#xg)">X</text>
+
+  <!-- Sparkle stars -->
+  <polygon points="87,10 90,19 99,22 90,25 87,34 84,25 75,22 84,19" fill="#FFC247"/>
+  <polygon points="99,3 101,9 107,11 101,13 99,19 97,13 91,11 97,9" fill="#FFC247"/>
+
+  <!-- Wordmark: ganjaran (navy) + x (gold) using tspan for exact join -->
+  <text x="108" y="50" font-family="Arial, Helvetica, sans-serif" font-size="34" font-weight="700">
+    <tspan fill="#1B2660">Ganjaran</tspan><tspan fill="#f5a623">X</tspan>
+  </text>
+
+  <!-- Tagline -->
+  <text x="110" y="65" font-family="Arial, Helvetica, sans-serif" font-size="9.5" font-weight="600" letter-spacing="2.5">
+    <tspan fill="#1B2660">REWARD </tspan><tspan fill="#f5a623">•</tspan><tspan fill="#1B2660"> RECOGNIZE </tspan><tspan fill="#f5a623">•</tspan><tspan fill="#1B2660"> REDEEM</tspan>
+  </text>
+</svg>
