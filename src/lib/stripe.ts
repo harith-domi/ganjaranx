@@ -1,7 +1,12 @@
 const STRIPE_API = "https://api.stripe.com/v1";
 
+function cleanKey(raw: string | undefined): string {
+  // Strip BOM (U+FEFF, charCode 65279) that PowerShell injects on Windows, plus whitespace
+  return (raw ?? "").split("").filter(c => c.charCodeAt(0) !== 0xFEFF).join("").trim();
+}
+
 function authHeader() {
-  return `Bearer ${process.env.STRIPE_SECRET_KEY}`;
+  return `Bearer ${cleanKey(process.env.STRIPE_SECRET_KEY)}`;
 }
 
 export interface StripeSessionParams {
