@@ -1,15 +1,41 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import LanguageSwitcher from "@/components/LanguageSwitcher";
 import { useLang } from "@/context/LanguageContext";
 import { usePoints } from "@/hooks/usePoints";
+import { createClient } from "@/lib/supabase-browser";
+import type { User } from "@supabase/supabase-js";
 
 export default function Navbar() {
   const [open, setOpen] = useState(false);
   const { t } = useLang();
   const { balance } = usePoints();
+  const [user, setUser] = useState<User | null>(null);
+  const router = useRouter();
+
+  useEffect(() => {
+    const supabase = createClient();
+    supabase.auth.getUser().then(({ data }) => setUser(data.user));
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      setUser(session?.user ?? null);
+    });
+    return () => subscription.unsubscribe();
+  }, []);
+
+  const handleSignOut = async () => {
+    const supabase = createClient();
+    await supabase.auth.signOut();
+    setUser(null);
+    router.push("/");
+    router.refresh();
+  };
+
+  const initials = user?.user_metadata?.name
+    ? user.user_metadata.name.split(" ").map((n: string) => n[0]).join("").toUpperCase().slice(0, 2)
+    : user?.email?.[0]?.toUpperCase() ?? "?";
 
   return (
     <nav className="sticky top-0 z-50 bg-white/95 backdrop-blur-md border-b border-slate-100 dark:bg-[#0b1020]/95 dark:border-slate-800">
@@ -28,7 +54,7 @@ export default function Navbar() {
         <div className="hidden md:flex items-center gap-3">
           <LanguageSwitcher />
 
-          {/* Points balance — only shown once localStorage is loaded */}
+          {/* Points balance */}
           {balance !== null && balance > 0 && (
             <Link
               href="/topup"
@@ -38,12 +64,32 @@ export default function Navbar() {
             </Link>
           )}
 
-          <Link href="/auth/signin" className="text-sm font-medium text-slate-700 hover:text-[#f5a623] dark:text-slate-300 transition-colors">
-            {t("nav_signin")}
-          </Link>
-          <Link href="/auth/signup" className="text-sm font-semibold bg-[#1b2660] text-white px-5 py-2 rounded-full hover:bg-[#141d4a] transition-all hover:scale-105 active:scale-95 whitespace-nowrap">
-            {t("nav_signup")}
-          </Link>
+          {user ? (
+            <div className="flex items-center gap-2">
+              {/* Avatar chip */}
+              <Link href="/dashboard" className="flex items-center gap-2 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 px-3 py-1.5 rounded-full transition-colors">
+                <div className="w-6 h-6 bg-[#1b2660] text-white rounded-full flex items-center justify-center text-xs font-bold">{initials}</div>
+                <span className="text-sm font-medium text-slate-700 dark:text-slate-300 max-w-[100px] truncate">
+                  {user.user_metadata?.name ?? user.email}
+                </span>
+              </Link>
+              <button
+                onClick={handleSignOut}
+                className="text-xs text-slate-500 hover:text-red-500 transition-colors font-medium"
+              >
+                Sign out
+              </button>
+            </div>
+          ) : (
+            <>
+              <Link href="/auth/signin" className="text-sm font-medium text-slate-700 hover:text-[#f5a623] dark:text-slate-300 transition-colors">
+                {t("nav_signin")}
+              </Link>
+              <Link href="/auth/signup" className="text-sm font-semibold bg-[#1b2660] text-white px-5 py-2 rounded-full hover:bg-[#141d4a] transition-all hover:scale-105 active:scale-95 whitespace-nowrap">
+                {t("nav_signup")}
+              </Link>
+            </>
+          )}
         </div>
 
         <button
@@ -62,19 +108,30 @@ export default function Navbar() {
           <Link href="/about" onClick={() => setOpen(false)} className="text-slate-700 dark:text-slate-300">{t("nav_about")}</Link>
           <Link href="/contact" onClick={() => setOpen(false)} className="text-slate-700 dark:text-slate-300">{t("nav_contact")}</Link>
           <div className="border-t border-slate-100 dark:border-slate-800 pt-4 flex flex-col gap-3">
-            {/* Mobile points balance */}
             {balance !== null && balance > 0 && (
               <div className="flex items-center gap-1.5 text-[#f5a623] font-bold text-sm">
                 ⚡ {balance.toLocaleString()} pts
               </div>
             )}
-            <div className="self-start">
-              <LanguageSwitcher />
-            </div>
-            <Link href="/auth/signin" onClick={() => setOpen(false)} className="text-slate-700 dark:text-slate-300">{t("nav_signin")}</Link>
-            <Link href="/auth/signup" onClick={() => setOpen(false)} className="bg-[#1b2660] text-white px-5 py-2 rounded-full text-center">
-              {t("nav_signup")}
-            </Link>
+            <div className="self-start"><LanguageSwitcher /></div>
+            {user ? (
+              <>
+                <div className="flex items-center gap-2 text-slate-700 dark:text-slate-300">
+                  <div className="w-7 h-7 bg-[#1b2660] text-white rounded-full flex items-center justify-center text-xs font-bold">{initials}</div>
+                  <span className="font-medium">{user.user_metadata?.name ?? user.email}</span>
+                </div>
+                <button onClick={() => { handleSignOut(); setOpen(false); }} className="text-sm text-red-500 text-left font-medium">
+                  Sign out
+                </button>
+              </>
+            ) : (
+              <>
+                <Link href="/auth/signin" onClick={() => setOpen(false)} className="text-slate-700 dark:text-slate-300">{t("nav_signin")}</Link>
+                <Link href="/auth/signup" onClick={() => setOpen(false)} className="bg-[#1b2660] text-white px-5 py-2 rounded-full text-center">
+                  {t("nav_signup")}
+                </Link>
+              </>
+            )}
           </div>
         </div>
       )}
