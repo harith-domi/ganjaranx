@@ -8,8 +8,15 @@ export default function SignInPage() {
   const [password, setPassword] = useState("");
   const [notified, setNotified] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    try {
+      await fetch("/api/waitlist", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, source: "signin" }),
+      });
+    } catch (_) { /* fail silently */ }
     setNotified(true);
   };
 

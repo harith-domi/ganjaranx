@@ -8,8 +8,15 @@ export default function SignUpPage() {
   const [email, setEmail] = useState("");
   const [notified, setNotified] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    try {
+      await fetch("/api/waitlist", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name, email, source: "signup" }),
+      });
+    } catch (_) { /* fail silently — UX still works */ }
     setNotified(true);
   };
 

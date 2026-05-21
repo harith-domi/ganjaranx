@@ -9,8 +9,15 @@ export default function ContactPage() {
   const [form, setForm] = useState({ name: "", email: "", contact: "", enquiry: "" });
   const [submitted, setSubmitted] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    try {
+      await fetch("/api/contact", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(form),
+      });
+    } catch (_) { /* fail silently */ }
     setSubmitted(true);
   };
 
