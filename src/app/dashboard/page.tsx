@@ -16,21 +16,13 @@ export default function DashboardPage() {
   useEffect(() => {
     const supabase = createClient();
 
-    // getSession reads from local cache — no network call needed
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      if (!session?.user) {
-        router.push("/auth/signin");
-      } else {
-        setUser(session.user);
-        setLoading(false);
-      }
-    });
-
-    // Also listen for auth changes
+    // onAuthStateChange fires immediately with INITIAL_SESSION — no network call, no flicker
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
       if (session?.user) {
         setUser(session.user);
         setLoading(false);
+      } else {
+        router.push("/auth/signin");
       }
     });
 
