@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
-import { createClient } from "@/lib/supabase-browser";
 import { useAuth } from "@/context/AuthContext";
 
 const BALANCE_KEY = "gx_balance";
@@ -12,40 +11,16 @@ export function usePoints() {
   const [balance, setBalance] = useState<number | null>(null);
 
   useEffect(() => {
-    if (authLoading) return; // Wait for auth to resolve
-
-    const supabase = createClient();
+    if (authLoading) return;
 
     if (user) {
-      // Fetch balance from DB
-      supabase
-        .from("points_wallet")
-        .select("balance")
-        .eq("user_id", user.id)
-        .single()
-        .then(({ data }) => setBalance(data?.balance ?? 0));
-
-      // Real-time subscription
-      const channel = supabase
-        .channel(`wallet:${user.id}`)
-        .on(
-          "postgres_changes",
-          {
-            event: "UPDATE",
-            schema: "public",
-            table: "points_wallet",
-            filter: `user_id=eq.${user.id}`,
-          },
-          (payload) => {
-            const newBalance = (payload.new as { balance: number }).balance;
-            setBalance(newBalance);
-          }
-        )
-        .subscribe();
-
-      return () => { supabase.removeChannel(channel); };
+      // Fetch balance from server API (bypasses RLS issues)
+      fetch("/api/points/balance")
+        .then(r => r.json())
+        .then(d => setBalance(d.balance ?? 0))
+        .catch(() => setBalance(0));
     } else {
-      // Guest: use localStorage
+      // Guest: localStorage
       const stored = localStorage.getItem(BALANCE_KEY);
       setBalance(stored !== null ? parseInt(stored, 10) || 0 : 0);
     }
