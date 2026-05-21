@@ -29,7 +29,7 @@ export default function HomePage() {
   return (
     <div>
       {/* ── Hero ── */}
-      <section className="bg-gradient-to-br from-[#070c1f] via-[#1b2660] to-[#070c1f] text-white overflow-hidden">
+      <section aria-label="Hero — Earn & Redeem Rewards in Malaysia" className="bg-gradient-to-br from-[#070c1f] via-[#1b2660] to-[#070c1f] text-white overflow-hidden">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 py-16 sm:py-24 flex flex-col lg:flex-row items-center gap-12 lg:gap-16">
           <div className="flex-1 max-w-xl text-center lg:text-left">
             <div className="hero-badge inline-flex items-center gap-2 bg-[#f5a623]/10 border border-[#f5a623]/25 text-[#f5a623] text-sm px-4 py-2 rounded-full mb-6">
@@ -95,7 +95,7 @@ export default function HomePage() {
       </section>
 
       {/* ── How it works ── */}
-      <section className="py-20 sm:py-24 px-4 sm:px-6">
+      <section aria-label="How GanjaranX works" className="py-20 sm:py-24 px-4 sm:px-6">
         <div className="max-w-7xl mx-auto">
           <AnimatedSection className="text-center mb-16">
             <p className="text-[#f5a623] font-semibold text-sm uppercase tracking-wider mb-3">{t("how_label")}</p>
@@ -118,7 +118,7 @@ export default function HomePage() {
       </section>
 
       {/* ── Categories ── */}
-      <section className="py-16 px-4 sm:px-6 bg-slate-50 dark:bg-slate-800/30">
+      <section aria-label="Reward categories in Malaysia" className="py-16 px-4 sm:px-6 bg-slate-50 dark:bg-slate-800/30">
         <div className="max-w-7xl mx-auto">
           <AnimatedSection className="text-center mb-12">
             <p className="text-[#f5a623] font-semibold text-sm uppercase tracking-wider mb-3">{t("cat_label")}</p>
@@ -142,7 +142,7 @@ export default function HomePage() {
       </section>
 
       {/* ── Featured Rewards ── */}
-      <section className="py-20 sm:py-24 px-4 sm:px-6">
+      <section aria-label="Featured rewards — redeem points for vouchers and experiences" className="py-20 sm:py-24 px-4 sm:px-6">
         <div className="max-w-7xl mx-auto">
           <AnimatedSection className="flex items-end justify-between mb-10">
             <div>
@@ -184,7 +184,7 @@ export default function HomePage() {
       </section>
 
       {/* ── Featured Tasks ── */}
-      <section className="py-20 sm:py-24 px-4 sm:px-6 bg-slate-50 dark:bg-slate-800/30">
+      <section aria-label="Featured tasks — earn Ganjaran Points by completing challenges" className="py-20 sm:py-24 px-4 sm:px-6 bg-slate-50 dark:bg-slate-800/30">
         <div className="max-w-7xl mx-auto">
           <AnimatedSection className="flex items-end justify-between mb-10">
             <div>
@@ -223,7 +223,7 @@ export default function HomePage() {
       </section>
 
       {/* ── CTA banner ── */}
-      <section className="py-20 sm:py-24 px-4 sm:px-6">
+      <section aria-label="Join GanjaranX — start earning rewards today" className="py-20 sm:py-24 px-4 sm:px-6">
         <div className="max-w-7xl mx-auto">
           <AnimatedSection scale>
             <div className="bg-gradient-to-r from-[#1b2660] to-[#243075] rounded-3xl px-6 sm:px-16 py-14 sm:py-16 text-center text-white">
