@@ -18,7 +18,6 @@ export function usePoints() {
 
       if (user) {
         setUserId(user.id);
-        // Read balance from DB
         const { data } = await supabase
           .from("points_wallet")
           .select("balance")
@@ -26,7 +25,6 @@ export function usePoints() {
           .single();
         setBalance(data?.balance ?? 0);
       } else {
-        // Fallback to localStorage for guests
         const stored = localStorage.getItem(BALANCE_KEY);
         setBalance(stored !== null ? parseInt(stored, 10) || 0 : 0);
       }
@@ -37,7 +35,6 @@ export function usePoints() {
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
       if (session?.user) {
         setUserId(session.user.id);
-        // Refresh DB balance on auth change
         supabase
           .from("points_wallet")
           .select("balance")
@@ -54,21 +51,24 @@ export function usePoints() {
     return () => subscription.unsubscribe();
   }, []);
 
-  // Credit points — uses DB for logged-in users, localStorage for guests
   const creditPoints = useCallback(async (pts: number, refId: string): Promise<boolean> => {
     if (userId) {
-      // For logged-in users, webhook already credited DB — just refresh balance
-      const supabase = createClient();
-      const { data } = await supabase
-        .from("points_wallet")
-        .select("balance")
-        .eq("user_id", userId)
-        .single();
-      setBalance(data?.balance ?? 0);
-      return true;
+      // Logged-in: credit via server API (idempotent — safe to call multiple times)
+      try {
+        const res = await fetch("/api/points/credit", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ pts, refId }),
+        });
+        const data = await res.json();
+        if (typeof data.balance === "number") setBalance(data.balance);
+        return true;
+      } catch {
+        return false;
+      }
     }
 
-    // Guest: use localStorage with idempotency check
+    // Guest: localStorage with idempotency check
     const raw = localStorage.getItem(CREDITED_KEY);
     const credited: string[] = raw ? JSON.parse(raw) : [];
     if (credited.includes(refId)) return false;
