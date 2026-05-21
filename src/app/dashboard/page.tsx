@@ -15,14 +15,26 @@ export default function DashboardPage() {
 
   useEffect(() => {
     const supabase = createClient();
-    supabase.auth.getUser().then(({ data }) => {
-      if (!data.user) {
+
+    // getSession reads from local cache — no network call needed
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      if (!session?.user) {
         router.push("/auth/signin");
       } else {
-        setUser(data.user);
+        setUser(session.user);
         setLoading(false);
       }
     });
+
+    // Also listen for auth changes
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      if (session?.user) {
+        setUser(session.user);
+        setLoading(false);
+      }
+    });
+
+    return () => subscription.unsubscribe();
   }, [router]);
 
   if (loading) {
