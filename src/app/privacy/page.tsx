@@ -82,7 +82,7 @@ export default function PrivacyPage() {
             <li>Withdraw consent to receive marketing communications.</li>
             <li>Request deletion of your personal data (subject to legal retention requirements).</li>
           </ul>
-          <p className="mt-3">To exercise any of these rights, contact us at <a href="mailto:privacy@ganjaranx.com" className="text-[#f5a623] hover:underline">privacy@ganjaranx.com</a>.</p>
+          <p className="mt-3">To exercise any of these rights, contact us at <a href="mailto:hello@ganjaranx.com" className="text-[#f5a623] hover:underline">hello@ganjaranx.com</a>.</p>
         </section>
 
         <section>
@@ -111,7 +111,7 @@ export default function PrivacyPage() {
           <p>If you have any questions about this Privacy Policy, please contact us:</p>
           <ul className="list-none mt-3 space-y-1">
             <li><strong>GanjaranX</strong></li>
-            <li>Email: <a href="mailto:privacy@ganjaranx.com" className="text-[#f5a623] hover:underline">privacy@ganjaranx.com</a></li>
+            <li>Email: <a href="mailto:hello@ganjaranx.com" className="text-[#f5a623] hover:underline">hello@ganjaranx.com</a></li>
             <li>Website: <a href="https://ganjaranx.com/contact" className="text-[#f5a623] hover:underline">ganjaranx.com/contact</a></li>
             <li>Governing Law: Malaysia (Personal Data Protection Act 2010)</li>
           </ul>

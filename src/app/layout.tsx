@@ -111,6 +111,7 @@ const jsonLd = {
       },
       description:
         "GanjaranX is Malaysia's leading task-to-reward loyalty marketplace. Earn Ganjaran Points by completing tasks and redeem them for real-world rewards.",
+      email: "hello@ganjaranx.com",
       foundingLocation: {
         "@type": "Country",
         name: "Malaysia",
@@ -119,7 +120,6 @@ const jsonLd = {
         "@type": "Country",
         name: "Malaysia",
       },
-      sameAs: [],
     },
     {
       "@type": "WebSite",

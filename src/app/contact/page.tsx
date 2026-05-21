@@ -30,8 +30,8 @@ export default function ContactPage() {
               <span className="text-[#1b2660] dark:text-[#f5a623] font-bold text-lg">@</span>
             </div>
             <p className="text-sm font-semibold text-slate-900 dark:text-white mb-1">Email</p>
-            <a href="mailto:support@ganjaranx.com" className="text-[#f5a623] hover:underline font-medium">
-              support@ganjaranx.com
+            <a href="mailto:hello@ganjaranx.com" className="text-[#f5a623] hover:underline font-medium">
+              hello@ganjaranx.com
             </a>
           </div>
 

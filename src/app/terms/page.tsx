@@ -113,7 +113,7 @@ export default function TermsPage() {
 
         <section>
           <h2 className="text-lg font-bold text-slate-900 dark:text-white mb-3">13. Contact</h2>
-          <p>For questions about these Terms, contact us at <a href="mailto:legal@ganjaranx.com" className="text-[#f5a623] hover:underline">legal@ganjaranx.com</a> or visit <a href="https://ganjaranx.com/contact" className="text-[#f5a623] hover:underline">ganjaranx.com/contact</a>.</p>
+          <p>For questions about these Terms, contact us at <a href="mailto:hello@ganjaranx.com" className="text-[#f5a623] hover:underline">hello@ganjaranx.com</a> or visit <a href="https://ganjaranx.com/contact" className="text-[#f5a623] hover:underline">ganjaranx.com/contact</a>.</p>
         </section>
 
       </div>
