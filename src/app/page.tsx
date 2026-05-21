@@ -65,7 +65,7 @@ export default function HomePage() {
               </div>
               <div className="hero-card-2 float-2 absolute bottom-0 right-0 bg-[#1b2660] text-white rounded-2xl p-5 shadow-2xl w-48 sm:w-52">
                 <p className="text-xs opacity-70 mb-1 font-medium">Your Balance</p>
-                <p className="text-3xl font-extrabold text-[#f5a623]">12,450</p>
+                <p className="text-3xl font-extrabold text-[#f5a623]">3,200</p>
                 <p className="text-sm opacity-70 mt-1">Ganjaran Points</p>
               </div>
               <div className="hero-card-3 float-3 absolute top-[45%] left-[15%] bg-[#0d1430] text-white rounded-2xl p-4 shadow-2xl w-44 sm:w-48 border border-white/10">
@@ -82,7 +82,7 @@ export default function HomePage() {
           <div className="max-w-7xl mx-auto px-4 sm:px-6 py-8 grid grid-cols-3 gap-4">
             {[
               { label: t("stats_users"), value: "10,000+" },
-              { label: t("stats_tasks"), value: "50+" },
+              { label: t("stats_tasks"), value: "24+" },
               { label: t("stats_redeemed"), value: "RM 1M+" },
             ].map((stat) => (
               <div key={stat.label} className="text-center">
