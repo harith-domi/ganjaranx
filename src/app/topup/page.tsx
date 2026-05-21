@@ -18,7 +18,7 @@ const packages = [
 
 export default function TopUpPage() {
   const { balance } = usePoints();
-  const [selected, setSelected] = useState(packages[2].id); // default: Popular
+  const [selected, setSelected] = useState(packages[3].id); // default: Popular (index 3)
   const [method, setMethod] = useState<PaymentMethod>("billplz");
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");

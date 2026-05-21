@@ -23,6 +23,7 @@ export default function Footer() {
             <li><Link href="/marketplace" className="hover:text-[#f5a623] transition-colors">{t("nav_marketplace")}</Link></li>
             <li><Link href="/marketplace?tab=tasks" className="hover:text-[#f5a623] transition-colors">{t("nav_tasks")}</Link></li>
             <li><Link href="/marketplace?tab=rewards" className="hover:text-[#f5a623] transition-colors">{t("nav_rewards")}</Link></li>
+            <li><Link href="/topup" className="hover:text-[#f5a623] transition-colors font-medium text-[#f5a623]">⚡ GX Top-Up</Link></li>
           </ul>
         </div>
         <div>
@@ -37,12 +38,18 @@ export default function Footer() {
           <ul className="flex flex-col gap-3 text-sm text-slate-600 dark:text-slate-400">
             <li><Link href="/about" className="hover:text-[#f5a623] transition-colors">{t("nav_about")}</Link></li>
             <li><Link href="/contact" className="hover:text-[#f5a623] transition-colors">{t("nav_contact")}</Link></li>
+            <li><Link href="/privacy" className="hover:text-[#f5a623] transition-colors">Privacy Policy</Link></li>
+            <li><Link href="/terms" className="hover:text-[#f5a623] transition-colors">Terms of Service</Link></li>
           </ul>
         </div>
       </div>
       <div className="border-t border-slate-100 dark:border-slate-800">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 py-4 text-xs text-slate-400">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 py-4 flex flex-col sm:flex-row items-center justify-between gap-2 text-xs text-slate-400">
           <span>{t("footer_copyright")}</span>
+          <div className="flex gap-4">
+            <Link href="/privacy" className="hover:text-[#f5a623] transition-colors">Privacy</Link>
+            <Link href="/terms" className="hover:text-[#f5a623] transition-colors">Terms</Link>
+          </div>
         </div>
       </div>
     </footer>
