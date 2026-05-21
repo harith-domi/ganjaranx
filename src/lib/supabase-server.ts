@@ -1,11 +1,15 @@
 import { createServerClient } from "@supabase/ssr";
 import { cookies } from "next/headers";
 
+function clean(val: string | undefined): string {
+  return (val ?? "").replace(/[﻿\r\n]/g, "").trim();
+}
+
 export async function createClient() {
   const cookieStore = await cookies();
   return createServerClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    clean(process.env.NEXT_PUBLIC_SUPABASE_URL),
+    clean(process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY),
     {
       cookies: {
         getAll() { return cookieStore.getAll(); },
