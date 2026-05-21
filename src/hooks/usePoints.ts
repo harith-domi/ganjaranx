@@ -2,108 +2,57 @@
 
 import { useState, useEffect, useCallback } from "react";
 import { createClient } from "@/lib/supabase-browser";
+import { useAuth } from "@/context/AuthContext";
 
 const BALANCE_KEY = "gx_balance";
 const CREDITED_KEY = "gx_credited_ids";
 
 export function usePoints() {
+  const { user, loading: authLoading } = useAuth();
   const [balance, setBalance] = useState<number | null>(null);
-  const [userId, setUserId] = useState<string | null>(null);
 
   useEffect(() => {
+    if (authLoading) return; // Wait for auth to resolve
+
     const supabase = createClient();
-    let realtimeChannel: ReturnType<typeof supabase.channel> | null = null;
 
-    async function init() {
-      const { data: { user } } = await supabase.auth.getUser();
+    if (user) {
+      // Fetch balance from DB
+      supabase
+        .from("points_wallet")
+        .select("balance")
+        .eq("user_id", user.id)
+        .single()
+        .then(({ data }) => setBalance(data?.balance ?? 0));
 
-      if (user) {
-        setUserId(user.id);
+      // Real-time subscription
+      const channel = supabase
+        .channel(`wallet:${user.id}`)
+        .on(
+          "postgres_changes",
+          {
+            event: "UPDATE",
+            schema: "public",
+            table: "points_wallet",
+            filter: `user_id=eq.${user.id}`,
+          },
+          (payload) => {
+            const newBalance = (payload.new as { balance: number }).balance;
+            setBalance(newBalance);
+          }
+        )
+        .subscribe();
 
-        // Initial balance fetch
-        const { data } = await supabase
-          .from("points_wallet")
-          .select("balance")
-          .eq("user_id", user.id)
-          .single();
-        setBalance(data?.balance ?? 0);
-
-        // Real-time subscription — fires whenever balance changes in DB
-        realtimeChannel = supabase
-          .channel(`wallet:${user.id}`)
-          .on(
-            "postgres_changes",
-            {
-              event: "UPDATE",
-              schema: "public",
-              table: "points_wallet",
-              filter: `user_id=eq.${user.id}`,
-            },
-            (payload) => {
-              const newBalance = (payload.new as { balance: number }).balance;
-              setBalance(newBalance);
-            }
-          )
-          .subscribe();
-      } else {
-        const stored = localStorage.getItem(BALANCE_KEY);
-        setBalance(stored !== null ? parseInt(stored, 10) || 0 : 0);
-      }
+      return () => { supabase.removeChannel(channel); };
+    } else {
+      // Guest: use localStorage
+      const stored = localStorage.getItem(BALANCE_KEY);
+      setBalance(stored !== null ? parseInt(stored, 10) || 0 : 0);
     }
-
-    init();
-
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (_event, session) => {
-      // Clean up previous channel
-      if (realtimeChannel) {
-        supabase.removeChannel(realtimeChannel);
-        realtimeChannel = null;
-      }
-
-      if (session?.user) {
-        setUserId(session.user.id);
-
-        const { data } = await supabase
-          .from("points_wallet")
-          .select("balance")
-          .eq("user_id", session.user.id)
-          .single();
-        setBalance(data?.balance ?? 0);
-
-        // Re-subscribe for new user
-        realtimeChannel = supabase
-          .channel(`wallet:${session.user.id}`)
-          .on(
-            "postgres_changes",
-            {
-              event: "UPDATE",
-              schema: "public",
-              table: "points_wallet",
-              filter: `user_id=eq.${session.user.id}`,
-            },
-            (payload) => {
-              const newBalance = (payload.new as { balance: number }).balance;
-              setBalance(newBalance);
-            }
-          )
-          .subscribe();
-      } else {
-        setUserId(null);
-        const stored = localStorage.getItem(BALANCE_KEY);
-        setBalance(stored !== null ? parseInt(stored, 10) || 0 : 0);
-      }
-    });
-
-    return () => {
-      subscription.unsubscribe();
-      if (realtimeChannel) supabase.removeChannel(realtimeChannel);
-    };
-  }, []);
+  }, [user, authLoading]);
 
   const creditPoints = useCallback(async (pts: number, refId: string): Promise<boolean> => {
-    if (userId) {
-      // Logged-in: credit via server API (idempotent)
-      // Balance will auto-update via real-time subscription
+    if (user) {
       try {
         const res = await fetch("/api/points/credit", {
           method: "POST",
@@ -118,7 +67,7 @@ export function usePoints() {
       }
     }
 
-    // Guest: localStorage with idempotency check
+    // Guest: localStorage with idempotency
     const raw = localStorage.getItem(CREDITED_KEY);
     const credited: string[] = raw ? JSON.parse(raw) : [];
     if (credited.includes(refId)) return false;
@@ -129,7 +78,7 @@ export function usePoints() {
     localStorage.setItem(CREDITED_KEY, JSON.stringify([...credited, refId]));
     setBalance(next);
     return true;
-  }, [userId]);
+  }, [user]);
 
   return { balance, creditPoints };
 }
