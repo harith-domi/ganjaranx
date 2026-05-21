@@ -90,7 +90,7 @@ export const metadata: Metadata = {
     creator: "@ganjaranx",
   },
   verification: {
-    google: "google-site-verification-placeholder",
+    google: "3x6zvM2vzSrEBjAD7Bm1V7QXMpPwfIM81DIqXEDWHqc",
   },
 };
 
