@@ -12,18 +12,39 @@ export function usePoints() {
 
   useEffect(() => {
     const supabase = createClient();
+    let realtimeChannel: ReturnType<typeof supabase.channel> | null = null;
 
     async function init() {
       const { data: { user } } = await supabase.auth.getUser();
 
       if (user) {
         setUserId(user.id);
+
+        // Initial balance fetch
         const { data } = await supabase
           .from("points_wallet")
           .select("balance")
           .eq("user_id", user.id)
           .single();
         setBalance(data?.balance ?? 0);
+
+        // Real-time subscription — fires whenever balance changes in DB
+        realtimeChannel = supabase
+          .channel(`wallet:${user.id}`)
+          .on(
+            "postgres_changes",
+            {
+              event: "UPDATE",
+              schema: "public",
+              table: "points_wallet",
+              filter: `user_id=eq.${user.id}`,
+            },
+            (payload) => {
+              const newBalance = (payload.new as { balance: number }).balance;
+              setBalance(newBalance);
+            }
+          )
+          .subscribe();
       } else {
         const stored = localStorage.getItem(BALANCE_KEY);
         setBalance(stored !== null ? parseInt(stored, 10) || 0 : 0);
@@ -32,15 +53,40 @@ export function usePoints() {
 
     init();
 
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (_event, session) => {
+      // Clean up previous channel
+      if (realtimeChannel) {
+        supabase.removeChannel(realtimeChannel);
+        realtimeChannel = null;
+      }
+
       if (session?.user) {
         setUserId(session.user.id);
-        supabase
+
+        const { data } = await supabase
           .from("points_wallet")
           .select("balance")
           .eq("user_id", session.user.id)
-          .single()
-          .then(({ data }) => setBalance(data?.balance ?? 0));
+          .single();
+        setBalance(data?.balance ?? 0);
+
+        // Re-subscribe for new user
+        realtimeChannel = supabase
+          .channel(`wallet:${session.user.id}`)
+          .on(
+            "postgres_changes",
+            {
+              event: "UPDATE",
+              schema: "public",
+              table: "points_wallet",
+              filter: `user_id=eq.${session.user.id}`,
+            },
+            (payload) => {
+              const newBalance = (payload.new as { balance: number }).balance;
+              setBalance(newBalance);
+            }
+          )
+          .subscribe();
       } else {
         setUserId(null);
         const stored = localStorage.getItem(BALANCE_KEY);
@@ -48,12 +94,16 @@ export function usePoints() {
       }
     });
 
-    return () => subscription.unsubscribe();
+    return () => {
+      subscription.unsubscribe();
+      if (realtimeChannel) supabase.removeChannel(realtimeChannel);
+    };
   }, []);
 
   const creditPoints = useCallback(async (pts: number, refId: string): Promise<boolean> => {
     if (userId) {
-      // Logged-in: credit via server API (idempotent — safe to call multiple times)
+      // Logged-in: credit via server API (idempotent)
+      // Balance will auto-update via real-time subscription
       try {
         const res = await fetch("/api/points/credit", {
           method: "POST",
