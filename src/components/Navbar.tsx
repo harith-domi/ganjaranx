@@ -7,23 +7,14 @@ import LanguageSwitcher from "@/components/LanguageSwitcher";
 import { useLang } from "@/context/LanguageContext";
 import { usePoints } from "@/hooks/usePoints";
 import { createClient } from "@/lib/supabase-browser";
-import type { User } from "@supabase/supabase-js";
+import { useAuth } from "@/context/AuthContext";
 
 export default function Navbar() {
   const [open, setOpen] = useState(false);
   const { t } = useLang();
   const { balance } = usePoints();
-  const [user, setUser] = useState<User | null>(null);
+  const { user } = useAuth();
   const router = useRouter();
-
-  useEffect(() => {
-    const supabase = createClient();
-    supabase.auth.getUser().then(({ data }) => setUser(data.user));
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-      setUser(session?.user ?? null);
-    });
-    return () => subscription.unsubscribe();
-  }, []);
 
   const handleSignOut = async () => {
     const supabase = createClient();
