@@ -6,7 +6,6 @@ import Link from "next/link";
 import { usePoints } from "@/hooks/usePoints";
 
 const packages: Record<string, { pts: number; bonus: number; priceMYR: number }> = {
-  "100":   { pts: 100,   bonus: 0,    priceMYR: 1   },
   "200":   { pts: 200,   bonus: 0,    priceMYR: 2   },
   "500":   { pts: 500,   bonus: 0,    priceMYR: 5   },
   "1000":  { pts: 1000,  bonus: 50,   priceMYR: 10  },

@@ -7,7 +7,6 @@ import { usePoints } from "@/hooks/usePoints";
 type PaymentMethod = "billplz" | "stripe";
 
 const packages = [
-  { id: "100",   pts: 100,   priceMYR: 1,   label: "Starter",  popular: false, bonus: 0 },
   { id: "200",   pts: 200,   priceMYR: 2,   label: "Bronze",   popular: false, bonus: 0 },
   { id: "500",   pts: 500,   priceMYR: 5,   label: "Basic",    popular: false, bonus: 0 },
   { id: "1000",  pts: 1000,  priceMYR: 10,  label: "Popular",  popular: true,  bonus: 50 },
